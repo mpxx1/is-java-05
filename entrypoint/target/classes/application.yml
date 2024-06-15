@@ -1,0 +1,59 @@
+server:
+  port: 8082
+  error:
+    include-message: always
+
+spring:
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      enable-auto-commit: false
+
+    request:
+      topics:
+        - request-owners
+        - request-cats
+
+    reply:
+      topics:
+        - reply-owners
+        - reply-cats
+
+    group:
+      id:
+        - group-owners
+        - group-cats
+
+
+  application:
+    name: entrypoint-service
+    version: v0.1.0
+
+  datasource:
+    url: jdbc:postgresql://localhost:8782/postgres
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+
+# Not the best place to store pepper
+# For studding purposes only
+# Do not do this in your production
+pepper: "##%%MY_NAME!!!IS@LikEA/KiSsOFFFFF&&&&&77DEA?TH98"
