@@ -1,7 +1,7 @@
 package me.macao.percistence;
 
 import me.macao.dto.DetailsCreateDTO;
-import me.macao.dto.DetailsUpdateDTO;
+import me.macao.dto.DetailsInternalUpdDTO;
 import me.macao.exception.ObjectNotFoundException;
 
 import java.util.Collection;
@@ -18,7 +18,7 @@ public interface UserDao {
 
     User create(final DetailsCreateDTO userDto);
 
-    User update(final DetailsUpdateDTO userDto)
+    User update(final DetailsInternalUpdDTO userDto)
             throws ObjectNotFoundException;
 
     void deleteById(final Long id);

@@ -1,37 +1,40 @@
 package me.macao.controller;
 
+import lombok.NonNull;
 import me.macao.dto.UserResponseDTO;
 import me.macao.dto.UserUpdateDTO;
-import me.macao.exception.*;
+import me.macao.exception.DataTransferException;
+import me.macao.exception.InvalidOperationException;
+import me.macao.exception.ObjectNotFoundException;
+import me.macao.exception.PasswordCreateException;
 import me.macao.msdto.request.EmailRequest;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Collection;
 
-public interface OwnerController {
+public interface UserController {
 
+    @NonNull
     Collection<UserResponseDTO> getAllUsers()
             throws AccessDeniedException, DataTransferException;
 
-    UserResponseDTO getUserById(final Long id)
+    @NonNull
+    UserResponseDTO getUserById(@NonNull final Long id)
             throws AccessDeniedException, ObjectNotFoundException,
             DataTransferException;
 
-    UserResponseDTO getUserByEmail(final EmailRequest request)
+    @NonNull
+    UserResponseDTO getUserByEmail(@NonNull final EmailRequest request)
             throws AccessDeniedException, ObjectNotFoundException,
             DataTransferException;
 
-    UserResponseDTO updateUser(     // base
-            final UserUpdateDTO updateDTO
+    @NonNull
+    UserResponseDTO updateUser(
+            @NonNull final Long id,
+            @NonNull final UserUpdateDTO updateDTO
     ) throws InvalidOperationException, ObjectNotFoundException,
             AccessDeniedException, PasswordCreateException, DataTransferException;
 
-    UserResponseDTO updateUser(     // admin
-            final Long id,
-            final UserUpdateDTO updateDTO
-    ) throws InvalidOperationException, ObjectNotFoundException,
-            AccessDeniedException, PasswordCreateException, DataTransferException;
-
-    void deleteUser(final Long id)
+    void deleteUser(@NonNull final Long id)
             throws AccessDeniedException, DataTransferException;
 }

@@ -47,17 +47,27 @@ public class UserServiceImpl
     @Override
     @NonNull
     public final DetailsResponseDTO updateUser(
-            @NonNull final PasswordUpdateDTO userDto
+            @NonNull final DetailsUpdateDTO userDto
     ) throws ObjectNotFoundException, InvalidOperationException,
-            PasswordCreateException {
+            PasswordCreateException, EmailCreateException {
 
-        var salt = cryptoService.generateSalt();
-        cryptoService.passVerify(userDto.password());
+        String salt = cryptoService.generateSalt();
 
-        DetailsUpdateDTO uDto = new DetailsUpdateDTO(
+        if (userDto.newPassword() != null)
+            cryptoService.passVerify(userDto.newPassword());
+
+        if (userDto.newUsername() != null)
+            cryptoService.mailVerify(userDto.newUsername());
+
+        DetailsInternalUpdDTO uDto = new DetailsInternalUpdDTO(
                 userDto.id(),
-                cryptoService.encode(userDto.password(), salt),
-                salt
+                userDto.newUsername() != null
+                    ? userDto.newUsername()
+                    : null,
+                userDto.newPassword() != null
+                    ? cryptoService.encode(userDto.newPassword(), salt)
+                    : null,
+                userDto.newPassword() != null ? salt : null
         );
 
         return dtoMapper.userToResponseDTO(

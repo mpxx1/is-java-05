@@ -2,7 +2,7 @@ package me.macao.service;
 
 import lombok.NonNull;
 import me.macao.dto.DetailsResponseDTO;
-import me.macao.dto.PasswordUpdateDTO;
+import me.macao.dto.DetailsUpdateDTO;
 import me.macao.exception.InvalidOperationException;
 import me.macao.exception.ObjectNotFoundException;
 import me.macao.exception.PasswordCreateException;
@@ -22,7 +22,7 @@ public interface UserService
 
     @NonNull
     DetailsResponseDTO updateUser(
-            @NonNull final PasswordUpdateDTO userDto
+            @NonNull final DetailsUpdateDTO userDto
     ) throws ObjectNotFoundException, InvalidOperationException,
             PasswordCreateException;
 

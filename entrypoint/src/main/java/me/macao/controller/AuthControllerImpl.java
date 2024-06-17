@@ -1,8 +1,8 @@
 package me.macao.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import me.macao.dto.AuthenticationResponse;
 import me.macao.dto.UserInitDTO;
 import me.macao.dto.UserLoginDTO;
@@ -28,32 +28,30 @@ public class AuthControllerImpl
     private final OwnerProducer ownerProducer;
     private final ObjectMapper mapper = new ObjectMapper();
 
+    @NonNull
     @PostMapping("signup")
     public final AuthenticationResponse register(
-            @RequestBody final UserInitDTO regDto
+            @NonNull @RequestBody final UserInitDTO regDto
     ) throws InvalidOperationException, DateTimeParseException,
-            EmailCreateException, PasswordCreateException,
-            JsonProcessingException {
+            EmailCreateException, PasswordCreateException {
 
         AuthenticationResponse authResponse = authService.register(regDto);
 
         var optionalOwner = ownerProducer
                 .kafkaRequestReply(
                         "create_owner",
-                        mapper.writeValueAsString(
-                                new OwnerCreateDTO(
-                                        userService.getUserIdByEmail(
-                                                regDto.email()
-                                        ),
+                        new OwnerCreateDTO(
+                                userService.getUserIdByEmail(
                                         regDto.email()
-                                )
+                                ),
+                                regDto.email()
                         )
                 );
 
         try {
 
             mapper.readValue(
-                    optionalOwner.toString(), OwnerResponseDTO.class
+                    optionalOwner, OwnerResponseDTO.class
             );
 
             return authResponse;
@@ -70,9 +68,10 @@ public class AuthControllerImpl
         }
     }
 
+    @NonNull
     @GetMapping("login")
     public final AuthenticationResponse login(
-            @RequestBody final UserLoginDTO loginDto
+            @NonNull @RequestBody final UserLoginDTO loginDto
     ) throws ObjectNotFoundException {
 
         return authService.authenticate(loginDto);

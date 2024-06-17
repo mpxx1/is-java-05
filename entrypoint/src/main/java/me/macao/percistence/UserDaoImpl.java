@@ -3,7 +3,7 @@ package me.macao.percistence;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import me.macao.dto.DetailsCreateDTO;
-import me.macao.dto.DetailsUpdateDTO;
+import me.macao.dto.DetailsInternalUpdDTO;
 import me.macao.exception.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -61,11 +61,12 @@ public class UserDaoImpl
 
     @Override
     @Transactional
-    public User update(final DetailsUpdateDTO userDto)
+    public User update(final DetailsInternalUpdDTO userDto)
             throws ObjectNotFoundException {
 
         User user = findById(userDto.id());
 
+        user.setUsername(userDto.new_username());
         user.setPassword(userDto.new_pass_hash());
         user.setSalt(userDto.new_salt());
 

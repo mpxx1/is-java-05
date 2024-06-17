@@ -4,6 +4,7 @@ import lombok.NonNull;
 
 public record DetailsUpdateDTO(
         @NonNull Long id,
-        String new_pass_hash,
-        String new_salt
-) { }
+        String newUsername,
+        String newPassword
+) {
+}

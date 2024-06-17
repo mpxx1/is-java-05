@@ -1,5 +1,8 @@
 package me.macao.kafka;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import me.macao.exception.DataTransferException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -7,7 +10,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
@@ -16,6 +18,9 @@ import java.util.concurrent.TimeUnit;
 public class OwnerProducer {
 
     private final ReplyingKafkaTemplate<String, Object, Object> ownerReplyTemplate;
+    private final ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     public OwnerProducer(
             @Qualifier("replyingOwnerKafkaTemplate")
@@ -27,24 +32,28 @@ public class OwnerProducer {
     @Value("${spring.kafka.request.topics[0]}")
     private String ownerRequestTopic;
 
-    public Object kafkaRequestReply(final String key, final Object request)
+    public String kafkaRequestReply(final String key, final Object request)
             throws DataTransferException {
-
-        ProducerRecord<String, Object> record =
-                new ProducerRecord<>(ownerRequestTopic, key, request);
-
-        RequestReplyFuture<String, Object, Object> replyFuture = ownerReplyTemplate.sendAndReceive(record);
 
         try {
 
-            SendResult<String, Object> sendResult = replyFuture
+            ProducerRecord<String, Object> record =
+                    new ProducerRecord<>(
+                            ownerRequestTopic,
+                            key,
+                            mapper.writeValueAsString(request)
+                    );
+
+            RequestReplyFuture<String, Object, Object> replyFuture = ownerReplyTemplate.sendAndReceive(record);
+
+            replyFuture
                     .getSendFuture()
                     .get(10, TimeUnit.SECONDS);
 
             ConsumerRecord<String, Object> consumerRecord = replyFuture
                     .get(20, TimeUnit.SECONDS);
 
-            return consumerRecord.value();
+            return consumerRecord.value().toString();
 
         } catch (Exception e) {
 

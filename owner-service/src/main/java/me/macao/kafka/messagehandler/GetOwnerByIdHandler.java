@@ -42,7 +42,7 @@ public class GetOwnerByIdHandler
                         )
                 );
 
-            return mapper.writeValueAsString(owner);
+            return mapper.writeValueAsString(owner.get());
 
         } catch (Exception e) {
 

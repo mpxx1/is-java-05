@@ -1,6 +1,6 @@
 package me.macao.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.NonNull;
 import me.macao.dto.AuthenticationResponse;
 import me.macao.dto.UserInitDTO;
 import me.macao.dto.UserLoginDTO;
@@ -10,11 +10,12 @@ import java.time.format.DateTimeParseException;
 
 public interface AuthController {
 
-    AuthenticationResponse register(final UserInitDTO regDto)
+    @NonNull
+    AuthenticationResponse register(@NonNull final UserInitDTO regDto)
             throws InvalidOperationException, DateTimeParseException,
-            EmailCreateException, PasswordCreateException,
-            JsonProcessingException;
+            EmailCreateException, PasswordCreateException;
 
-    AuthenticationResponse login(final UserLoginDTO loginDto)
+    @NonNull
+    AuthenticationResponse login(@NonNull final UserLoginDTO loginDto)
             throws ObjectNotFoundException;
 }
