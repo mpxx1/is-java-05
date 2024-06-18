@@ -51,20 +51,5 @@ public class KafkaConfig {
         return repliesContainer;
     }
 
-//    @Bean
-//    public KafkaTemplate<String, Object>
-//    replyOwnerTemplate(
-//            ProducerFactory<String, Object> pf,
-//            ConcurrentKafkaListenerContainerFactory<String, Object> factory
-//    ) {
-//        KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(pf);
-//
-//        factory
-//                .getContainerProperties()
-//                .setMissingTopicsFatal(false);
-//        factory
-//                .setReplyTemplate(kafkaTemplate);
-//
-//        return kafkaTemplate;
-//    }
+    // impl for cats
 }

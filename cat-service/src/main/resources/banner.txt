@@ -1,0 +1,10 @@
+
+ ______     ______     ______
+/\  ___\   /\  __ \   /\__  _\ 
+\ \ \____  \ \  __ \  \/_/\ \/ 
+ \ \_____\  \ \_\ \_\    \ \_\ 
+  \/_____/   \/_/\/_/     \/_/ 
+                               
+service version ${spring.application.version}
+powered by Spring Boot ${spring-boot.version}
+dev: Makar A. Pestrikov
