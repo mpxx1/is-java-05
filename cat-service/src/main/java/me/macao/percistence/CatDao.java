@@ -1,6 +1,6 @@
 package me.macao.percistence;
 
-import me.macao.dto.CatUpdateDTO;
+import me.macao.msdto.request.CatUpdateDTO;
 import me.macao.exception.ObjectNotFoundException;
 import me.macao.msdto.request.CatCreateDTO;
 

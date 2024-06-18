@@ -1,7 +1,7 @@
 package me.macao.service;
 
 import lombok.NonNull;
-import me.macao.dto.CatUpdateDTO;
+import me.macao.msdto.request.CatUpdateDTO;
 import me.macao.exception.ObjectNotFoundException;
 import me.macao.msdto.reply.CatResponseDTO;
 import me.macao.msdto.request.CatCreateDTO;

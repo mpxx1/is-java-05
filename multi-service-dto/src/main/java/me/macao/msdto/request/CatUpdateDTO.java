@@ -1,4 +1,4 @@
-package me.macao.dto;
+package me.macao.msdto.request;
 
 import lombok.NonNull;
 import me.macao.data.CatColor;

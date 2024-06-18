@@ -18,6 +18,11 @@ public class KafkaConfig {
     @Value("${spring.kafka.reply.topics[0]}")
     private String ownerReplyTopic;
 
+    @Value("${spring.kafka.group.id[1]}")
+    private String catGroupId;
+
+    @Value("${spring.kafka.reply.topics[1]}")
+    private String catReplyTopic;
 
     @Bean
     public ReplyingKafkaTemplate<String, Object, Object>
@@ -51,5 +56,35 @@ public class KafkaConfig {
         return repliesContainer;
     }
 
-    // impl for cats
+    @Bean
+    public ReplyingKafkaTemplate<String, Object, Object>
+    replyingCatKafkaTemplate(
+            ProducerFactory<String, Object> pf,
+            ConcurrentKafkaListenerContainerFactory<String, Object> factory
+    ) {
+        ConcurrentMessageListenerContainer<String, Object> replyContainer =
+                factory.createContainer(catReplyTopic);
+
+        replyContainer
+                .getContainerProperties()
+                .setMissingTopicsFatal(false);
+        replyContainer
+                .getContainerProperties()
+                .setGroupId(catGroupId);
+
+        return new ReplyingKafkaTemplate<>(pf, replyContainer);
+    }
+
+    @Bean
+    public ConcurrentMessageListenerContainer<String, Object> repliesCatContainer(
+            ConcurrentKafkaListenerContainerFactory<String, Object> containerFactory
+    ) {
+        ConcurrentMessageListenerContainer<String, Object> repliesContainer =
+                containerFactory.createContainer(catReplyTopic);
+
+        repliesContainer.getContainerProperties().setGroupId(catGroupId);
+        repliesContainer.setAutoStartup(false);
+
+        return repliesContainer;
+    }
 }
