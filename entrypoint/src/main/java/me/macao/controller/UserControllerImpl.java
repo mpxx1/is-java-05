@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import me.macao.dto.*;
 import me.macao.exception.*;
+import me.macao.kafka.CatProducer;
 import me.macao.kafka.OwnerProducer;
 import me.macao.msdto.reply.*;
 import me.macao.msdto.request.*;
@@ -18,10 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +29,8 @@ public class UserControllerImpl
 
     private final UserService userDetailsService;
     private final OwnerProducer ownerProducer;
+    private final CatProducer catProducer;
+    private final ExceptionTranslator translator;
     private final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -48,14 +48,17 @@ public class UserControllerImpl
         var userDetails = userDetailsService.getAllUsers();
         var optionalOwners = ownerProducer
                 .kafkaRequestReply("get_all_owners", "");
+        var optionalCats = catProducer
+                .kafkaRequestReply("get_all_cats", "");
 
-        Collection<OwnerResponseDTO> owners;
+        Collection<OwnerResponseDTO> owners = new ArrayList<>();
 
         try {
 
             owners = mapper.readValue(
                     optionalOwners, new TypeReference<>() {}
             );
+
         } catch (Exception e) {
 
             try {
@@ -65,10 +68,8 @@ public class UserControllerImpl
                         ErrMap.class
                 );
 
-                throw new DataTransferException(
-                        "Internal error: " + err.reason() +
-                                "\nmessage: " + err.message()
-                );
+                translator.exec(err);
+
             } catch (Exception e1) {
 
                 throw new DataTransferException(
@@ -77,7 +78,11 @@ public class UserControllerImpl
             }
         }
 
-        return mergeToResponse(owners, userDetails);
+        return mergeToResponse(
+                owners,
+                userDetails,
+                getCats(optionalCats)
+        );
     }
 
     @NonNull
@@ -95,8 +100,16 @@ public class UserControllerImpl
         var userDetails = userDetailsService.getUserById(id);
         var optionalOwner = ownerProducer
                 .kafkaRequestReply("get_owner_by_id", new IdRequest(id));
+        var optionalCats = catProducer
+                .kafkaRequestReply(
+                        "get_cats_by_user_id", new IdRequest(id)
+                );
 
-        return mergeToResponse(getOwner(optionalOwner), userDetails);
+        return mergeToResponse(
+                getOwner(optionalOwner),
+                userDetails,
+                getCats(optionalCats)
+        );
     }
 
     @NonNull
@@ -153,7 +166,16 @@ public class UserControllerImpl
                             )
                         );
 
-        return mergeToResponse(getOwner(optionalOwner), userDetails);
+        var optionalCats = catProducer
+                .kafkaRequestReply(
+                        "get_cats_by_user_id", new IdRequest(id)
+                );
+
+        return mergeToResponse(
+                getOwner(optionalOwner),
+                userDetails,
+                getCats(optionalCats)
+        );
     }
 
     @DeleteMapping("{id}")
@@ -168,10 +190,19 @@ public class UserControllerImpl
         var optionalEmptyReply = ownerProducer
                 .kafkaRequestReply("delete_owner", new IdRequest(id));
 
+        var optionalCatEmptyReply = catProducer
+                .kafkaRequestReply(
+                        "delete_cats_by_user_id", new IdRequest(id)
+                );
+
         try {
 
             mapper.readValue(
                     optionalEmptyReply, EmptyReply.class
+            );
+
+            mapper.readValue(
+                    optionalCatEmptyReply, EmptyReply.class
             );
 
             userDetailsService.deleteUserById(id);
@@ -184,11 +215,8 @@ public class UserControllerImpl
                         ErrMap.class
                 );
 
-                throw new DataTransferException(
-                        "Internal error: " + err.reason() +
-                        "\nmessage: " + err.message() +
-                        "\nCan not delete user, try again later"
-                );
+                translator.exec(err);
+
             } catch (Exception e1) {
 
                 throw new DataTransferException(
@@ -206,6 +234,7 @@ public class UserControllerImpl
             return mapper.readValue(
                     optionalOwner, OwnerResponseDTO.class
             );
+
         } catch (Exception e) {
 
             try {
@@ -215,10 +244,8 @@ public class UserControllerImpl
                         ErrMap.class
                 );
 
-                throw new DataTransferException(
-                        "Internal error: " + err.reason() +
-                                "\nmessage: " + err.message()
-                );
+                translator.exec(err);
+
             } catch (Exception e1) {
 
                 throw new DataTransferException(
@@ -226,11 +253,41 @@ public class UserControllerImpl
                 );
             }
         }
+
+        return null;
+    }
+
+    private Collection<CatResponseDTO> getCats(String optionalCats) {
+
+        try {
+
+            return mapper.readValue(
+                    optionalCats, new TypeReference<>() {}
+            );
+        } catch (Exception e) {
+
+            try {
+
+                var err = mapper.readValue(
+                        optionalCats, ErrMap.class
+                );
+
+                translator.exec(err);
+            } catch (Exception e1) {
+
+                throw new DataTransferException(
+                        "Something went wrong: " + e1.getMessage()
+                );
+            }
+        }
+
+        return null;
     }
 
     private UserResponseDTO mergeToResponse(
             final OwnerResponseDTO owner,
-            final DetailsResponseDTO details
+            final DetailsResponseDTO details,
+            final Collection<CatResponseDTO> cats
     ) {
         return new UserResponseDTO(
                 details.id(),
@@ -238,19 +295,32 @@ public class UserControllerImpl
                 details.role(),
                 owner.name(),
                 owner.birthday(),
-                new ArrayList<>() // todo
+                cats
+                        .stream()
+                        .map(CatResponseDTO::catId)
+                        .toList()
         );
     }
 
     private Collection<UserResponseDTO> mergeToResponse(
             final Collection<OwnerResponseDTO> owners,
-            final Collection<DetailsResponseDTO> userDetails
+            final Collection<DetailsResponseDTO> userDetails,
+            final Collection<CatResponseDTO> cats
     ) {
 
         Map<Long, OwnerResponseDTO> ownersMap = new HashMap<>();
+        Map<Long, List<Long>> catsMap = new HashMap<>();
         Collection<UserResponseDTO> users = new ArrayList<>();
 
         for (var owner : owners) { ownersMap.put(owner.id(), owner); }
+        for (var cat : cats) {
+            catsMap
+                    .computeIfAbsent(
+                            cat.owner(),
+                            k -> new ArrayList<>()
+                    )
+                    .add(cat.catId());
+        }
 
         for (var details : userDetails) {
             users.add(
@@ -264,7 +334,9 @@ public class UserControllerImpl
                             ownersMap.get(
                                     details.id()
                             ).birthday(),
-                            new ArrayList<>() // todo
+                            catsMap.containsKey(details.id())
+                                    ? catsMap.get(details.id())
+                                    : new ArrayList<>()
                     )
             );
         }

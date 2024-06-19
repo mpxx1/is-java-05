@@ -39,7 +39,7 @@ public class DeleteOwnerHandler
             return mapper.writeValueAsString(
                     new ErrMap(
                             "Data transfer",
-                            "BAD REQUEST BODY (possibly sth with json)"
+                            "[OWNER SERVICE] BAD REQUEST BODY (possibly sth with json)"
                     )
             );
         }

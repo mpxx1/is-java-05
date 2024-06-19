@@ -40,7 +40,7 @@ public class UpdateOwnerHandler
             return mapper.writeValueAsString(
                     new ErrMap(
                             "Object not found",
-                            e.getMessage()
+                            "[OWNER SERVICE] " + e.getMessage()
                     )
             );
         }

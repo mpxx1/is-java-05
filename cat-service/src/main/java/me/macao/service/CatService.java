@@ -30,6 +30,8 @@ public interface CatService {
 
     void deleteCatById(@NonNull final Long id);
 
+    void deleteCatsByUserId(@NonNull final Long id);
+
     void addFriendOrRequest(
             @NonNull final Long srcId,
             @NonNull final Long dstId

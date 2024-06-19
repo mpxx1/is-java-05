@@ -1,10 +1,12 @@
 package me.macao.exception;
 
 import me.macao.msdto.reply.ErrMap;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ExceptionTranslator {
 
-    public static void exec(ErrMap map)
+    public void exec(ErrMap map)
             throws DataTransferException,
                 EmailCreateException, InvalidOperationException,
                 ObjectNotFoundException, PasswordCreateException {

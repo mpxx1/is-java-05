@@ -100,6 +100,19 @@ public class CatServiceImpl
     }
 
     @Override
+    public final void deleteCatsByUserId(@NonNull final Long userId) {
+
+        var cats = getCatsByUserId(userId);
+
+        if (!cats.isEmpty()) {
+            cats
+                    .forEach(
+                            c -> catDao.deleteById(c.catId())
+                    );
+        }
+    }
+
+    @Override
     public void addFriendOrRequest(
             @NonNull final Long srcId,
             @NonNull final Long dstId

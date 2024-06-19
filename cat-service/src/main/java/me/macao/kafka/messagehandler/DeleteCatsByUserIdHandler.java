@@ -8,17 +8,19 @@ import lombok.RequiredArgsConstructor;
 import me.macao.msdto.reply.CatResponseDTO;
 import me.macao.msdto.reply.EmptyReply;
 import me.macao.msdto.reply.ErrMap;
-import me.macao.msdto.request.CatCreateDTO;
+import me.macao.msdto.request.IdRequest;
 import me.macao.service.CatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+
 @Component
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class CreateCatHandler
-    implements MessageHandler {
+public class DeleteCatsByUserIdHandler
+        implements MessageHandler {
 
-    private final static String KEY = "create_cat";
+    private final static String KEY = "delete_cats_by_user_id";
     private final CatService service;
     private final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
@@ -30,10 +32,10 @@ public class CreateCatHandler
 
         try {
 
-            CatCreateDTO createDTO = mapper.readValue(value, CatCreateDTO.class);
-            CatResponseDTO responseDTO = service.createCat(createDTO);
+            IdRequest request = mapper.readValue(value, IdRequest.class);
+            service.deleteCatsByUserId(request.id());
 
-            return mapper.writeValueAsString(responseDTO);
+            return mapper.writeValueAsString(new EmptyReply());
 
         } catch (Exception e) {
 

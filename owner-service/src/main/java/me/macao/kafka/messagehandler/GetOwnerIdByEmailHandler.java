@@ -34,7 +34,7 @@ public class GetOwnerIdByEmailHandler
                 return mapper.writeValueAsString(
                         new ErrMap(
                                 "Object not found",
-                                "Owner with email " + request.email() + " not found"
+                                "[OWNER SERVICE] Owner with email " + request.email() + " not found"
                         )
                 );
 
@@ -47,7 +47,7 @@ public class GetOwnerIdByEmailHandler
             return mapper.writeValueAsString(
                     new ErrMap(
                             "Data transfer",
-                            "BAD REQUEST BODY (possibly sth with json)"
+                            "[OWNER SERVICE] BAD REQUEST BODY (possibly sth with json)"
                     )
             );
         }

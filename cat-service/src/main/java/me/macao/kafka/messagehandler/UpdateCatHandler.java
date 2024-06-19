@@ -39,7 +39,7 @@ public class UpdateCatHandler
             return mapper.writeValueAsString(
                     new ErrMap(
                             "Data transfer",
-                            "BAD REQUEST BODY (possibly sth with json)"
+                            "[CAT SERVICE] BAD REQUEST BODY (possibly sth with json)"
                     )
             );
         }

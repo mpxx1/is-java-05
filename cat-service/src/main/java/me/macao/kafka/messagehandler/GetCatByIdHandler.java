@@ -37,7 +37,7 @@ public class GetCatByIdHandler
                 return mapper.writeValueAsString(
                         new ErrMap(
                                 "Object not found",
-                                "Cat with id " + request.id() + " not found"
+                                "[CAT SERVICE] Cat with id " + request.id() + " not found"
                         )
                 );
 
@@ -48,7 +48,7 @@ public class GetCatByIdHandler
             return mapper.writeValueAsString(
                     new ErrMap(
                             "Data transfer",
-                            "BAD REQUEST BODY (possibly sth with json)"
+                            "[CAT SERVICE] BAD REQUEST BODY (possibly sth with json)"
                     )
             );
         }

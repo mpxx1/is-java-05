@@ -40,7 +40,7 @@ public class CreateOwnerHandler
             return mapper.writeValueAsString(
                     new ErrMap(
                             "Invalid operation",
-                            e.getMessage()
+                            "[OWNER SERVICE] " + e.getMessage()
                     )
             );
         } catch (Exception e) {
@@ -48,7 +48,7 @@ public class CreateOwnerHandler
             return mapper.writeValueAsString(
                     new ErrMap(
                             "Data transfer",
-                            "BAD REQUEST BODY (possibly sth with json)"
+                            "[OWNER SERVICE] BAD REQUEST BODY (possibly sth with json)"
                     )
             );
         }
