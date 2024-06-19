@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import me.macao.msdto.reply.CatResponseDTO;
-import me.macao.msdto.reply.EmptyReply;
 import me.macao.msdto.reply.ErrMap;
 import me.macao.msdto.request.CatCreateDTO;
 import me.macao.service.CatService;

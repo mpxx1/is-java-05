@@ -10,7 +10,7 @@ import java.util.Collection;
 @Service
 public class DTOMapper {
 
-    public final CatResponseDTO catToResponseDTO(
+    public CatResponseDTO catToResponseDTO(
             final Cat cat,
             final Collection<Cat> reqsIn
     ) {

@@ -23,7 +23,7 @@ public class CatServiceImpl
 
     @Override
     @NonNull
-    public final Collection<CatResponseDTO> getAllCats() {
+    public Collection<CatResponseDTO> getAllCats() {
 
         return catDao
                 .findAll()
@@ -38,7 +38,7 @@ public class CatServiceImpl
 
     @Override
     @NonNull
-    public final Collection<CatResponseDTO> getCatsByUserId(
+    public Collection<CatResponseDTO> getCatsByUserId(
             @NonNull final Long id
     ) {
 
@@ -56,7 +56,7 @@ public class CatServiceImpl
 
     @Override
     @NonNull
-    public final Optional<CatResponseDTO> getCatById(
+    public Optional<CatResponseDTO> getCatById(
             @NonNull final Long id
     ) {
 
@@ -74,7 +74,7 @@ public class CatServiceImpl
 
     @Override
     @NonNull
-    public final CatResponseDTO createCat(
+    public CatResponseDTO createCat(
             @NonNull final CatCreateDTO catDto
     ) {
 
@@ -85,7 +85,7 @@ public class CatServiceImpl
 
     @Override
     @NonNull
-    public final CatResponseDTO updateCat(
+    public CatResponseDTO updateCat(
             @NonNull final CatUpdateDTO catDto
     ) throws ObjectNotFoundException {
 
@@ -95,12 +95,12 @@ public class CatServiceImpl
     }
 
     @Override
-    public final void deleteCatById(@NonNull final Long id) {
+    public void deleteCatById(@NonNull final Long id) {
         catDao.deleteById(id);
     }
 
     @Override
-    public final void deleteCatsByUserId(@NonNull final Long userId) {
+    public void deleteCatsByUserId(@NonNull final Long userId) {
 
         var cats = getCatsByUserId(userId);
 
@@ -192,7 +192,7 @@ public class CatServiceImpl
     }
 
     @Override
-    public final void deleteFriendOrRequest(
+    public void deleteFriendOrRequest(
             @NonNull final Long srcId,
             @NonNull final Long dstId
     ) throws ObjectNotFoundException {
@@ -271,12 +271,14 @@ public class CatServiceImpl
     }
 
     @NonNull
-    private Collection<Cat> getReqsIn(@NonNull final Cat cat) {
+    private Collection<Cat> getReqsIn(@NonNull Cat cat) {
 
-        return catDao
-                .findAll()
-                .stream()
-                .filter(c -> c.getReqsOut().contains(cat))
-                .toList();
+        return new ArrayList<>(
+                catDao
+                        .findAll()
+                        .stream()
+                        .filter(c -> c.getReqsOut().contains(cat))
+                        .toList()
+        );
     }
 }

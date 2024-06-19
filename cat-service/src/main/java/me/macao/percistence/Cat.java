@@ -54,7 +54,7 @@ public class Cat {
     )
     private Collection<Cat> friends = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @Builder.Default
     @JoinTable(
             name = "friendship_requests",
