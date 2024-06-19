@@ -281,7 +281,7 @@ public class UserControllerImpl
             }
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     private UserResponseDTO mergeToResponse(
