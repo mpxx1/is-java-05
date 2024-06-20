@@ -1,5 +1,6 @@
 package me.macao.service;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import me.macao.msdto.request.CatUpdateDTO;
@@ -95,7 +96,40 @@ public class CatServiceImpl
     }
 
     @Override
+    @Transactional
     public void deleteCatById(@NonNull final Long id) {
+
+        Cat tgtCat = catDao
+                .findById(id)
+                .orElseThrow(
+                        () -> new ObjectNotFoundException(
+                                "Cat with id " + id + " not found"
+                        )
+                );
+
+        tgtCat.setReqsOut(new ArrayList<>());
+        tgtCat.setFriends(new ArrayList<>());
+
+        Collection<Cat> friendsIn = catDao
+                .findAll()
+                .stream()
+                .filter(c -> c.getFriends().contains(tgtCat))
+                .toList();
+
+        for (Cat friend : friendsIn) {
+            var newFriends = new ArrayList<>(friend.getFriends());
+            newFriends.remove(tgtCat);
+            friend.setFriends(newFriends);
+        }
+
+        Collection<Cat> reqsIn = getReqsIn(tgtCat);
+
+        for (Cat req : reqsIn) {
+            var newReqs = new ArrayList<>(req.getReqsOut());
+            newReqs.remove(tgtCat);
+            req.setReqsOut(newReqs);
+        }
+
         catDao.deleteById(id);
     }
 
@@ -113,6 +147,7 @@ public class CatServiceImpl
     }
 
     @Override
+    @Transactional
     public void addFriendOrRequest(
             @NonNull final Long srcId,
             @NonNull final Long dstId
@@ -192,6 +227,7 @@ public class CatServiceImpl
     }
 
     @Override
+    @Transactional
     public void deleteFriendOrRequest(
             @NonNull final Long srcId,
             @NonNull final Long dstId
@@ -273,12 +309,10 @@ public class CatServiceImpl
     @NonNull
     private Collection<Cat> getReqsIn(@NonNull Cat cat) {
 
-        return new ArrayList<>(
-                catDao
-                        .findAll()
-                        .stream()
-                        .filter(c -> c.getReqsOut().contains(cat))
-                        .toList()
-        );
+        return catDao
+                .findAll()
+                .stream()
+                .filter(c -> c.getReqsOut().contains(cat))
+                .toList();
     }
 }

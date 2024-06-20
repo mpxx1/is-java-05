@@ -44,7 +44,7 @@ public class Cat {
     @Column(nullable = false)
     private Long owner;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @Builder.Default
     @JoinTable(
             name = "friends", joinColumns = {

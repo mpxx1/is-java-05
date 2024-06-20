@@ -93,7 +93,7 @@ public class CatControllerImpl
                         )
         );
 
-        if (user.role() != UserRole.ADMIN ||
+        if (user.role() != UserRole.ADMIN &&
                 !(user.id().equals(response.owner())))
             throw new AccessDeniedException("Access denied");
 
@@ -182,7 +182,8 @@ public class CatControllerImpl
     }
 
     @Override
-    public void deleteCat(long id)
+    @DeleteMapping("{id}")
+    public void deleteCat(@PathVariable("id") long id)
             throws AccessDeniedException {
 
         var user = getUserFromSecurityContext();
