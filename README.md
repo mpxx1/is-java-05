@@ -1,6 +1,6 @@
 # Lab-5 
 
-## [Other labs](https://github.com/mpxx1/is-java-tech)
+[Other labs](https://github.com/mpxx1/is-java-tech)
 
 ## Lab-1
 ## Learning Java syntax and a new environment.
